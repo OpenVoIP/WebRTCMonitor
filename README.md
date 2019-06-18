@@ -1,10 +1,5 @@
-# RTSPtoWebRTC
+# WebRTCMonitor
 
-this sample usage Pion WebRTC https://github.com/pions/webrtc stream RTSP camera to browser
+webRTC 监控
 
-1) git clone webrtc-monitor
-2) cd RTSPtoWebRTC
-3) you can edit 	url := "rtsp://admin:123456@171.25.232.42:1554/mpeg4cif" to any you stream
-4) go run *.go
-5) open browser http://127.0.0.1:8080
-
+由于 [h5stream](https://linkingvision.com/download/documentation/h5stream/) 不完全开源，使用 h5stream 前端，后端使用 golang + pion 重新实现.
