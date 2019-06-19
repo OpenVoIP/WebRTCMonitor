@@ -2,24 +2,31 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"webrtc-monitor/rtsp"
+	"webrtc-monitor/util"
 	"webrtc-monitor/web"
 
-	rtsp "github.com/deepch/sample_rtsp"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/pion/webrtc/v2/pkg/media"
 )
 
 // main 开始
 func main() {
+
+	//读取配置文件
+	util.ReadConf()
+
 	go web.StartHTTPServer()
-	// url := "rtsp://admin:123456@171.25.232.42:1554/mpeg4cif"
-	url := "rtsp://admin:admin@192.168.2.161"
+
+	url := "rtsp://admin:admin@192.168.11.63/live"
 	sps := []byte{}
 	pps := []byte{}
 	fuBuffer := []byte{}
 	count := 0
-	Client := rtsp.RtspClientNew()
-	Client.Debug = false
+
+	Client := rtsp.ClientNew()
+	Client.Debug = true
 	syncCount := 0
 	preTS := 0
 	writeNALU := func(sync bool, ts int, payload []byte) {
