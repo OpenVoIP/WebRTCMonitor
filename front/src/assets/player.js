@@ -1,5 +1,7 @@
 // h5splayer.js 不开源, 重新实现一个简单实现
 
+let hostname = window.location.hostname;
+
 function NewH5sPlayerRTC (conf) {
   this.url = conf.url
   this.videoid = conf.videoid
@@ -33,7 +35,8 @@ NewH5sPlayerRTC.prototype.connect = function () {
   this.pc.onicecandidate = event => {
     if (event.candidate === null) {
       let localSessionDescription = btoa(this.pc.localDescription.sdp)
-      $.post('http://localhost:8080/receive', { data: localSessionDescription, name: this.name }, (data) => {
+
+      $.post(`http://${hostname}:8082/receive`, { data: localSessionDescription, name: this.name }, (data) => {
         let remoteSessionDescription = data
         if (remoteSessionDescription === '') {
           return console.error('Session Description must not be empty')

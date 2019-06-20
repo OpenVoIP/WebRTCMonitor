@@ -1,0 +1,5 @@
+0.0.0.0:6080 {
+    root  ./front/dist
+    proxy /receive 127.0.0.1:8082 
+    proxy //api 127.0.0.1:8082 
+}
