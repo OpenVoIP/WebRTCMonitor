@@ -2,7 +2,6 @@ package web
 
 import (
 	"fmt"
-	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,22 +9,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"encoding/base64"
-
 	"webrtc-monitor/util"
 	v1 "webrtc-monitor/web/api/v1"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
-	"github.com/pion/webrtc/v2"
 	//ice "github.com/pions/webrtc/internal/ice"
 )
-
-var VideoTrack *webrtc.Track
-
-func init() {
-
-}
 
 // StartHTTPServer 开启 HTTP
 func StartHTTPServer() {
@@ -51,7 +41,7 @@ func StartHTTPServer() {
 	}
 
 	// rest
-	r.HandleFunc("/recive", HTTPHome)
+	r.HandleFunc("/receive", NewPeerConnection)
 	r.Put("/ping", Ping)
 	r.Mount("//api/v1", v1.Router())
 
@@ -94,55 +84,4 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fs.ServeHTTP(w, r)
 	}))
-}
-
-// HTTPHome 首页处理
-func HTTPHome(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	data := r.FormValue("data")
-	sd, err := base64.StdEncoding.DecodeString(data)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	// webrtc.RegisterDefaultCodecs()
-	//peerConnection, err := webrtc.New(webrtc.RTCConfiguration{
-	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{
-		ICEServers: []webrtc.ICEServer{
-			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
-			},
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-	peerConnection.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
-		fmt.Printf("Connection State has changed %s \n", connectionState.String())
-	})
-	vp8Track, err := peerConnection.NewTrack(webrtc.DefaultPayloadTypeH264, rand.Uint32(), "video", "pion2")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	_, err = peerConnection.AddTrack(vp8Track)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	offer := webrtc.SessionDescription{
-		Type: webrtc.SDPTypeOffer,
-		SDP:  string(sd),
-	}
-	if err := peerConnection.SetRemoteDescription(offer); err != nil {
-		log.Println(err)
-		return
-	}
-	answer, err := peerConnection.CreateAnswer(nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	w.Write([]byte(base64.StdEncoding.EncodeToString([]byte(answer.SDP))))
-	VideoTrack = vp8Track
 }

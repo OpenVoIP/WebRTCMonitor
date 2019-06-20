@@ -265,6 +265,7 @@ export default {
             this.proto = "WS";
             this.$root.bus.$emit('liveplayproto', "WS");
         },
+        
         changeRTC(event) {
             this.$root.bus.$emit('liveplayproto', "RTC");
             this.proto = "RTC";

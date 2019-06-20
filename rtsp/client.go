@@ -14,12 +14,16 @@ import (
 	"time"
 	"webrtc-monitor/rtsp/sdp"
 
+	"github.com/pion/webrtc/v2"
 	log "github.com/sirupsen/logrus"
 )
 
 //Client 属性
 type Client struct {
-	Debug         bool
+	URL           string          // rstp 地址
+	Debug         bool            // 是否开启调试
+	VideoTracks   []*webrtc.Track // webrtc 对端
+	Name          string
 	rtspTimeOut   time.Duration
 	rtptimeout    time.Duration
 	keepalivetime int
@@ -58,8 +62,8 @@ func ClientNew() *Client {
 }
 
 //Open 打开 rtsp 连接
-func (client *Client) Open(uri string) (err error) {
-	if err := client.ParseUrl(uri); err != nil {
+func (client *Client) Open() (err error) {
+	if err := client.ParseURL(client.URL); err != nil {
 		return err
 	}
 	if err := client.Connect(); err != nil {
@@ -89,13 +93,13 @@ func (client *Client) Open(uri string) (err error) {
 
 //Connect tcp 连接
 func (client *Client) Connect() (err error) {
+	var socket net.Conn
 	option := &net.Dialer{Timeout: client.rtspTimeOut * time.Second}
-	if socket, err := option.Dial("tcp", client.host+":"+client.port); err != nil {
+	if socket, err = option.Dial("tcp", client.host+":"+client.port); err != nil {
 		log.Error(err)
 		return err
-	} else {
-		client.socket = socket
 	}
+	client.socket = socket
 	return
 }
 
@@ -165,8 +169,8 @@ func (client *Client) Read() (buffer []byte, err error) {
 	}
 }
 
-//ParseUrl parse urls
-func (client *Client) ParseUrl(uri string) (err error) {
+//ParseURL parse urls
+func (client *Client) ParseURL(uri string) (err error) {
 	elemets, err := url.Parse(html.UnescapeString(uri))
 	if err != nil {
 		return err
@@ -370,4 +374,9 @@ func (client *Client) Close() {
 		if err := client.socket.Close(); err != nil {
 		}
 	}
+}
+
+//IsConnect 判断是否连接
+func (client *Client) IsConnect() bool {
+	return client.socket != nil
 }

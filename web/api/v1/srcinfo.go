@@ -2,6 +2,7 @@ package v1
 
 import (
 	"net/http"
+	"webrtc-monitor/rtsp"
 	"webrtc-monitor/util"
 
 	"github.com/go-chi/render"
@@ -10,7 +11,7 @@ import (
 //SrcInfo 视频源信息
 type SrcInfo struct {
 	EnableAudio       bool   `json:"bEnableAudio"`
-	Online            bool   `json:"bOnLine"`
+	Online            bool   `json:"bOnline"`
 	OnvifProfileAuto  bool   `json:"bOnvifProfileAuto"`
 	PasswdEncrypt     bool   `json:"bPasswdEncrypt"`
 	RTSPPlayback      bool   `json:"bRTSPPlayback"`
@@ -46,13 +47,21 @@ func (info *SrcInfo) Render(w http.ResponseWriter, r *http.Request) error {
 //GetSrcInfo 获取视频源
 func GetSrcInfo(w http.ResponseWriter, r *http.Request) {
 	infos := []*SrcInfo{}
-	for _, src := range util.ConfData.SourceConf.Src {
-		infos = append(infos, &SrcInfo{
-			URL:    src.URL,
-			Online: true,
-			Token:  src.Token,
-			Name:   src.Name,
-		})
+
+	for _, srcConf := range util.ConfData.SourceConf.Src {
+		src := &SrcInfo{
+			URL:    srcConf.URL,
+			Online: false,
+			Token:  srcConf.Token,
+			Name:   srcConf.Name,
+		}
+
+		if client, exist := rtsp.NameClientMap[srcConf.Name]; exist {
+			if client.IsConnect() {
+				src.Online = true
+			}
+		}
+		infos = append(infos, src)
 	}
 
 	render.Status(r, http.StatusOK)

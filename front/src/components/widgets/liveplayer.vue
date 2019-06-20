@@ -139,6 +139,7 @@ export default {
                 host: wsroot, //localhost:8080
                 rootpath: '/', // '/'
                 token: token,
+                name: token,
                 hlsver: 'v1', //v1 is for ts, v2 is for fmp4
                 session: this.$store.state.token //session got from login
             };
