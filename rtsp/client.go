@@ -20,7 +20,7 @@ import (
 
 //Client 属性
 type Client struct {
-	URL           string          // rstp 地址
+	URL           string          // rtsp 地址
 	Debug         bool            // 是否开启调试
 	VideoTracks   []*webrtc.Track // webrtc 对端
 	Name          string

@@ -231,6 +231,11 @@ export default {
                             console.log(data.token);
                             if (data.token) {
                                 let vid = 'h' + _this.$data.selectRow + _this.$data.selectCol;
+                                // 离线不处理
+                                if (data.icon.includes("mdi-camcorder-off")){
+                                    alert("设备离线, 刷新重新开始...")
+                                    return;
+                                }
                                 _this.$root.bus.$emit('liveplay', data.token, vid);
                                 return;
                             }
@@ -265,7 +270,7 @@ export default {
             this.proto = "WS";
             this.$root.bus.$emit('liveplayproto', "WS");
         },
-        
+
         changeRTC(event) {
             this.$root.bus.$emit('liveplayproto', "RTC");
             this.proto = "RTC";

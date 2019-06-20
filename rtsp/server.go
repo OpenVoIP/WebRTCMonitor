@@ -13,9 +13,13 @@ import (
 //NameClientMap 缓存
 var NameClientMap = make(map[string]*Client)
 
+//DataChanelTest 截屏写文件
+// var DataChanelTest = make(chan *webrtc.RTCSample, 1)
+
 //StartRTSPServer 开启 RTSP 服务
 func StartRTSPServer() {
 	for _, src := range util.ConfData.SourceConf.Src {
+		log.Infof("rtsp client %s", src.Name)
 		client := ClientNew()
 		client.URL = src.URL
 		client.Debug = false
@@ -30,14 +34,15 @@ func StartRTSPServer() {
 		syncCount := 0
 		preTS := 0
 		writeNALU := func(sync bool, ts int, payload []byte) {
+			// 数据写入 web 端
+			s := ts - preTS
+
 			// if DataChanelTest != nil && preTS != 0 {
 			// 	DataChanelTest <- webrtc.RTCSample{Data: payload, Samples: uint32(ts - preTS)}
 			// }
 
-			// 数据写入 web 端
 			for _, track := range client.VideoTracks {
 				if track != nil && preTS != 0 {
-					s := ts - preTS
 					go track.WriteSample(media.Sample{Data: payload, Samples: uint32(s)})
 				}
 			}
@@ -73,50 +78,54 @@ func StartRTSPServer() {
 			return
 		}
 
-		for {
-			select {
-			case <-client.Signals:
-				log.Error("Exit signals by rtsp")
-				return
-			case data := <-client.Outgoing:
-				count += len(data)
-				log.Debug("receive  rtp packet size", len(data), "receive all packet size", count)
-				if data[0] == 36 && data[1] == 0 {
-					cc := data[4] & 0xF
-					rtphdr := 12 + cc*4
-					ts := (int64(data[8]) << 24) + (int64(data[9]) << 16) + (int64(data[10]) << 8) + (int64(data[11]))
-					packno := (int64(data[6]) << 8) + int64(data[7])
-					if false {
-						log.Info("packet num", packno)
+		handler := func() {
+			for {
+				select {
+				case <-client.Signals:
+					log.Error("Exit signals by rtsp")
+					return
+				case data := <-client.Outgoing:
+					count += len(data)
+					log.Debug("receive  rtp packet size", len(data), "receive all packet size", count)
+					if data[0] == 36 && data[1] == 0 {
+						cc := data[4] & 0xF
+						rtphdr := 12 + cc*4
+						ts := (int64(data[8]) << 24) + (int64(data[9]) << 16) + (int64(data[10]) << 8) + (int64(data[11]))
+						packno := (int64(data[6]) << 8) + int64(data[7])
+						if false {
+							log.Info("packet num", packno)
+						}
+						nalType := data[4+rtphdr] & 0x1F
+						if nalType >= 1 && nalType <= 23 {
+							if nalType == 6 {
+								continue
+							}
+							handleNALU(nalType, data[4+rtphdr:], ts)
+						} else if nalType == 28 {
+							isStart := data[4+rtphdr+1]&0x80 != 0
+							isEnd := data[4+rtphdr+1]&0x40 != 0
+							nalType := data[4+rtphdr+1] & 0x1F
+							nal := data[4+rtphdr]&0xE0 | data[4+rtphdr+1]&0x1F
+							if isStart {
+								fuBuffer = []byte{0}
+							}
+							fuBuffer = append(fuBuffer, data[4+rtphdr+2:]...)
+							if isEnd {
+								fuBuffer[0] = nal
+								handleNALU(nalType, fuBuffer, ts)
+							}
+						}
+					} else if data[0] == 36 && data[1] == 2 {
+						log.Info("data[0] == 36 data[1] == 2")
+						//cc := data[4] & 0xF
+						//rtphdr := 12 + cc*4
+						//payload := data[4+rtphdr+4:]
 					}
-					nalType := data[4+rtphdr] & 0x1F
-					if nalType >= 1 && nalType <= 23 {
-						if nalType == 6 {
-							continue
-						}
-						handleNALU(nalType, data[4+rtphdr:], ts)
-					} else if nalType == 28 {
-						isStart := data[4+rtphdr+1]&0x80 != 0
-						isEnd := data[4+rtphdr+1]&0x40 != 0
-						nalType := data[4+rtphdr+1] & 0x1F
-						nal := data[4+rtphdr]&0xE0 | data[4+rtphdr+1]&0x1F
-						if isStart {
-							fuBuffer = []byte{0}
-						}
-						fuBuffer = append(fuBuffer, data[4+rtphdr+2:]...)
-						if isEnd {
-							fuBuffer[0] = nal
-							handleNALU(nalType, fuBuffer, ts)
-						}
-					}
-				} else if data[0] == 36 && data[1] == 2 {
-					log.Info("data[0] == 36 data[1] == 2")
-					//cc := data[4] & 0xF
-					//rtphdr := 12 + cc*4
-					//payload := data[4+rtphdr+4:]
 				}
 			}
 		}
+
+		go handler()
 	}
 }
 

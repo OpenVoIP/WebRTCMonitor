@@ -14,5 +14,8 @@ func Router() chi.Router {
 	r.Get("/GetRunInfo", GetRunInfo)
 	r.Get("/GetSystemInfo", GetSystemInfo)
 	r.Get("/GetSrc", GetSrcInfo)
+	r.Get("/Snapshot", Snapshot)
+	r.Get("/Record", Record)
+	r.Get("/Ptz", Ptz)
 	return r
 }
