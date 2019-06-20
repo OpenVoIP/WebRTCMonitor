@@ -43,7 +43,7 @@ func StartHTTPServer() {
 	// static dir
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "static")
-	FileServer(r, "//", http.Dir(filesDir))
+	FileServer(r, "/", http.Dir(filesDir))
 
 	// walk
 	if err := chi.Walk(r, walkFunc); err != nil {

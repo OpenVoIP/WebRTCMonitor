@@ -50,9 +50,21 @@ type Conf struct {
 		EnableIPPortCheck bool   `json:"bEnableIpPortCheck"`
 
 		Src []struct {
-			Name  string `json:"strName"`
-			Token string `json:"strToken"`
-			URL   string `json:"strUrl"`
+			Name              string `json:"strName"`
+			Token             string `json:"strToken"`
+			Type              string `json:"nType"`
+			URL               string `json:"strUrl"`
+			User              string `json:"strUser"`
+			Passwd            string `json:"strPasswd"`
+			PasswdEncrypt     bool   `json:"bPasswdEncrypt"`
+			EnableAudio       bool   `json:"bEnableAudio"`
+			ConnectType       string `json:"nConnectType"`
+			RTSPType          string `json:"nRTSPType"`
+			SrcIPAddress      string `json:"strSrcIpAddress"`
+			SrcPort           string `json:"strSrcPort"`
+			ChannelNumber     int    `json:"nChannelNumber"`
+			RTSPPlayback      bool   `json:"bRTSPPlayback"`
+			RTSPPlaybackSpeed bool   `json:"bRTSPPlaybackSpeed"`
 		} `json:"src"`
 	} `json:"source"`
 

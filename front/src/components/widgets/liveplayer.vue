@@ -47,8 +47,11 @@
 
 <script>
 import '../../assets/adapter.js'
-import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC} from '../../assets/h5splayer.js'
+// import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC} from '../../assets/h5splayer.js'
+import {NewH5sPlayerRTC} from '../../assets/player.js'
 import {H5siOS,H5sPlayerCreate} from '../../assets/h5splayerhelper.js'
+
+
 export default {
     name: 'liveplayer',
     props:['h5id', 'h5videoid'],
@@ -143,14 +146,17 @@ export default {
             var $controls = $container.children(".h5controls");
             var $rtcbutton = $controls.children(".rtcbutton");
 
+            this.proto = 'RTC';
             if (this.proto == 'RTC' || (H5siOS() === true))
             {
                 $rtcbutton.css("display", "block");
-                this.h5handler = new H5sPlayerRTC(conf);
+                // this.h5handler = new H5sPlayerRTC(conf);
+                this.h5handler = new NewH5sPlayerRTC(conf);
             }else 
             {
                 $rtcbutton.css("display", "none");
-                this.h5handler = new H5sPlayerWS(conf);
+                // this.h5handler = new H5sPlayerWS(conf);
+                alert("ws 未实现")
             }
 
             this.h5handler.connect();
