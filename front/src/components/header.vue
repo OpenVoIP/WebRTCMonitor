@@ -10,7 +10,7 @@
                     </b>
                         <!-- Logo text image you can use text also -->
                     <span class="hidden-xs">
-                        <!--This is dark logo text--><img src="../assets/img/h5sconsole.png" alt="home" class="dark-logo" /><!--This is light logo text--><img src="../assets/plugins/images/admin-text-dark.png" alt="home" class="light-logo" />
+                        <!--This is dark logo text--><img src="../assets/img/logo2.png" alt="home" class="dark-logo" /><!--This is light logo text--><img src="../assets/plugins/images/admin-text-dark.png" alt="home" class="light-logo" />
                      </span> 
                      </a>
                 </div>
