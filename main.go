@@ -2,6 +2,7 @@ package main
 
 import (
 	"webrtc-monitor/rtsp"
+	"webrtc-monitor/rtspserver"
 	"webrtc-monitor/util"
 	"webrtc-monitor/web"
 )
@@ -14,6 +15,7 @@ func main() {
 
 	go web.StartHTTPServer()
 	go rtsp.StartRTSPServer()
+	go rtspserver.StartSterver()
 
 	select {}
 }
