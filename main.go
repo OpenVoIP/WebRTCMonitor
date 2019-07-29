@@ -14,6 +14,7 @@ func main() {
 
 	go web.StartHTTPServer()
 	go rtsp.StartRTSPServer()
+	// go rtspserver.StartSterver()
 
 	select {}
 }

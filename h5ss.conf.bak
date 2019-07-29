@@ -260,7 +260,7 @@
     "bRTSPPlayback": false,
     "nRTSPPlaybackSpeedComment": "RTSP playback speed",
     "nRTSPPlaybackSpeed": 1
-   }
+   },
   ]
  },
  "device": {
