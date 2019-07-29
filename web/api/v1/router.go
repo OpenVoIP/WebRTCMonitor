@@ -11,11 +11,11 @@ func Router() chi.Router {
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 	// r.Use(AdminOnly)
 
-	r.Get("/GetRunInfo", GetRunInfo)
-	r.Get("/GetSystemInfo", GetSystemInfo)
-	r.Get("/GetSrc", GetSrcInfo)
-	r.Get("/Snapshot", Snapshot)
-	r.Get("/Record", Record)
-	r.Get("/Ptz", Ptz)
+	r.Get("/GetRunInfo", GetRunInfo)       // 运行信息
+	r.Get("/GetSystemInfo", GetSystemInfo) //系统信息
+	r.Get("/GetSrc", GetSrcInfo)           // 从配置文件读取源
+	r.Get("/Snapshot", Snapshot)           //截图
+	r.Get("/Record", Record)               // 回放
+	r.Get("/Ptz", Ptz)                     // 控制指令
 	return r
 }
