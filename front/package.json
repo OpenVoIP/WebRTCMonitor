@@ -22,7 +22,7 @@
     "jquery": "^3.3.1",
     "jquery-ui": "^1.12.1",
     "patternfly-bootstrap-treeview": "^2.1.5",
-    "qs": "^6.5.2",
+    "qs": "^6.5.3",
     "vee-validate": "^2.0.8",
     "vue": "^2.5.2",
     "vue-i18n": "^8.0.0",
